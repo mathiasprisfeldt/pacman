@@ -3,14 +3,10 @@ package me.mathiasprisfeldt.pacman;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import java.util.EventListener;
-import java.util.EventListenerProxy;
-
-public class MainMenu extends AppCompatActivity {
-
+public class InGame extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu);
+        setContentView(R.layout.activity_in_game);
     }
 }
