@@ -3,20 +3,28 @@ package me.mathiasprisfeldt.pacman;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import me.mathiasprisfeldt.pacman.Components.SpriteRenderer;
+import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class GameWorld extends View {
     private long _lastTime = System.nanoTime();
 
+    private MapBuilder _mapBuilder;
+
+    private GameObject[] _onDrawObjects = new GameObject[0];
+    private GameObject[] _onTouchObjects = new GameObject[0];
+
     private ArrayList<GameObject> _gameObjects = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToAdd = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToRemove = new ArrayList<>();
+    private VelocityTracker mVelocityTracker;
 
     public GameWorld(Context context, AttributeSet attrs) {
         super(context);
@@ -29,20 +37,21 @@ public class GameWorld extends View {
             }
         }, 0, 16);
 
-        GameObject newPacman = new GameObject(this);
-        newPacman.addComponent(new SpriteRenderer());
+        _mapBuilder = new MapBuilder(this);
     }
 
     public void onUpdate() {
         //Calculate deltatime
         long currTime = System.nanoTime();
-        float deltaTime = (int) ((currTime - _lastTime) / 1000);
+        float deltaTime = ((currTime - _lastTime) / 1000000000f);
         _lastTime = currTime;
 
         //Remove gameobjects that were marked for removal last frame
-        for (GameObject gameObject : _gameObjectsToRemove) {
+        for (int i = 0; i < _gameObjectsToRemove.size(); i++) {
+            GameObject gameObject = _gameObjectsToRemove.get(i);
             gameObject.onDestroyed();
         }
+
         _gameObjects.removeAll(_gameObjectsToRemove);
         _gameObjectsToRemove.clear();
 
@@ -51,21 +60,74 @@ public class GameWorld extends View {
         _gameObjectsToAdd.clear();
 
         //Run update method for each gameobject
-        for (GameObject gameObject : _gameObjects) {
+        for (int i = 0; i < _gameObjects.size(); i++) {
+            GameObject gameObject = _gameObjects.get(i);
             gameObject.onUpdate(deltaTime);
         }
 
-        invalidate();
+        postInvalidate();
     }
 
     public void onDraw(Canvas canvas) {
+        _onDrawObjects = _gameObjects.toArray(_onDrawObjects);
         canvas.drawColor(getResources().getColor(R.color.game_world_bg_color));
 
-        for (GameObject gameObject : _gameObjects) {
+        for (int i = 0; i < _onDrawObjects.length; i++) {
+            GameObject gameObject = _onDrawObjects[i];
             gameObject.onDraw(canvas);
         }
 
         super.onDraw(canvas);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        _onTouchObjects = _gameObjects.toArray(_onTouchObjects);
+
+        int index = event.getActionIndex();
+        int action = event.getActionMasked();
+        int pointerId = event.getPointerId(index);
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                if (mVelocityTracker == null) {
+                    mVelocityTracker = VelocityTracker.obtain();
+                } else {
+                    mVelocityTracker.clear();
+                }
+
+                mVelocityTracker.addMovement(event);
+
+                for (int i = 0; i < _onTouchObjects.length; i++) {
+                    GameObject gameObject = _onTouchObjects[i];
+                    gameObject.onTouchEvent(action, mVelocityTracker, Vector2D.Zero);
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                mVelocityTracker.addMovement(event);
+                mVelocityTracker.computeCurrentVelocity(1000);
+
+                for (int i = 0; i < _onTouchObjects.length; i++) {
+                    GameObject gameObject = _onTouchObjects[i];
+                    gameObject.onTouchEvent(
+                            action,
+                            mVelocityTracker,
+                            new Vector2D(
+                                    mVelocityTracker.getXVelocity(pointerId),
+                                    mVelocityTracker.getYVelocity(pointerId)));
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                for (int i = 0; i < _onTouchObjects.length; i++) {
+                    GameObject gameObject = _onTouchObjects[i];
+                    gameObject.onTouchEvent(action, mVelocityTracker, Vector2D.Zero);
+                }
+            case MotionEvent.ACTION_CANCEL:
+                mVelocityTracker.recycle();
+                mVelocityTracker = null;
+                break;
+        }
+        return true;
     }
 
     public void onReset() {

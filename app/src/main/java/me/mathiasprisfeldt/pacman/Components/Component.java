@@ -1,8 +1,14 @@
 package me.mathiasprisfeldt.pacman.Components;
 
-import android.graphics.Canvas;
+import me.mathiasprisfeldt.pacman.GameObject;
 
 public class Component {
+    GameObject _gameObject;
+
+    Component(GameObject gameObject) {
+        _gameObject = gameObject;
+    }
+
     public void onStart() {
 
     }
