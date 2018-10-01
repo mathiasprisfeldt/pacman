@@ -1,42 +1,28 @@
 package me.mathiasprisfeldt.pacman.Components;
 
 import android.content.res.Resources;
+import android.os.Debug;
 import android.util.Log;
 import android.view.VelocityTracker;
 
 import me.mathiasprisfeldt.pacman.GameObject;
 import me.mathiasprisfeldt.pacman.Interfaces.Touchable;
 import me.mathiasprisfeldt.pacman.Interfaces.Updateable;
+import me.mathiasprisfeldt.pacman.Map.CardinalDirection;
+import me.mathiasprisfeldt.pacman.Map.Edge;
+import me.mathiasprisfeldt.pacman.Map.Map;
+import me.mathiasprisfeldt.pacman.Map.Node;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
-public class Pacman extends Component implements Updateable, Touchable {
-    private SpriteRenderer _renderer;
-    private Vector2D direction = Vector2D.Zero;
+public class Pacman extends Pawn implements Touchable {
 
-    public Pacman(GameObject gameObject, SpriteRenderer renderer) {
-        super(gameObject);
-        _renderer = renderer;
+    public Pacman(GameObject gameObject, SpriteRenderer renderer, Node node, Map map) {
+        super(gameObject, renderer, node, map);
     }
 
     @Override
     public void onUpdate(float deltaTime) {
         super.onUpdate(deltaTime);
-
-        Vector2D pos = _gameObject.getTransform().getPosition();
-        int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels - _renderer.getSize().x();
-        int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-
-        if (pos.x() < 0)
-            direction = new Vector2D(1, direction.y());
-        else if (pos.x() > screenWidth)
-            direction = new Vector2D(-1, direction.y());
-
-        if (pos.y() < 0)
-            direction = new Vector2D(direction.x(), 1);
-        else if (pos.y() > screenHeight)
-            direction = new Vector2D(direction.x(), -1);
-
-        _gameObject.getTransform().setVelocity(direction.multiply(500));
     }
 
     @Override
@@ -49,7 +35,8 @@ public class Pacman extends Component implements Updateable, Touchable {
         if (vel.sqrMagnitude() > 2000000) {
             vel.Normalize();
             vel.ToCardinal();
-            direction = vel;
+
+            onNewDirection(CardinalDirection.fromPoint(vel.toPoint()));
         }
     }
 

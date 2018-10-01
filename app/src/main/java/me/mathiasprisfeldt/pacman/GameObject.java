@@ -27,7 +27,7 @@ public class GameObject {
         return _transform;
     }
 
-    GameObject(GameWorld gameWorld) {
+    public GameObject(GameWorld gameWorld) {
         _gameWorld = gameWorld;
         _gameWorld.add(this);
 
@@ -41,7 +41,7 @@ public class GameObject {
         addComponent(_transform = new Transform(this, x, y));
     }
 
-    <T extends Component> T addComponent(T component) {
+    public <T extends Component> T addComponent(T component) {
         _components.add(component);
         component.onStart();
         return component;

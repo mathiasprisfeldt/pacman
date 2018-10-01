@@ -11,12 +11,16 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import me.mathiasprisfeldt.pacman.Map.Map;
+import me.mathiasprisfeldt.pacman.Map.MapBuilder;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class GameWorld extends View {
+    private boolean _isPaused;
     private long _lastTime = System.nanoTime();
 
     private MapBuilder _mapBuilder;
+    private Map _map;
 
     private GameObject[] _onDrawObjects = new GameObject[0];
     private GameObject[] _onTouchObjects = new GameObject[0];
@@ -25,6 +29,10 @@ public class GameWorld extends View {
     private ArrayList<GameObject> _gameObjectsToAdd = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToRemove = new ArrayList<>();
     private VelocityTracker mVelocityTracker;
+
+    public void setIsPaused(boolean _isPaused) {
+        this._isPaused = _isPaused;
+    }
 
     public GameWorld(Context context, AttributeSet attrs) {
         super(context);
@@ -38,9 +46,13 @@ public class GameWorld extends View {
         }, 0, 16);
 
         _mapBuilder = new MapBuilder(this);
+        _map = _mapBuilder.getMap();
     }
 
     public void onUpdate() {
+        if (_isPaused)
+            return;
+
         //Calculate deltatime
         long currTime = System.nanoTime();
         float deltaTime = ((currTime - _lastTime) / 1000000000f);
@@ -71,6 +83,8 @@ public class GameWorld extends View {
     public void onDraw(Canvas canvas) {
         _onDrawObjects = _gameObjects.toArray(_onDrawObjects);
         canvas.drawColor(getResources().getColor(R.color.game_world_bg_color));
+
+        _map.onDraw(canvas);
 
         for (int i = 0; i < _onDrawObjects.length; i++) {
             GameObject gameObject = _onDrawObjects[i];

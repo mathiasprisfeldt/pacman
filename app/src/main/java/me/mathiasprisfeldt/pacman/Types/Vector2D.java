@@ -1,8 +1,7 @@
 package me.mathiasprisfeldt.pacman.Types;
 
 import android.support.annotation.NonNull;
-
-import me.mathiasprisfeldt.pacman.Interfaces.Resetable;
+import android.support.v4.math.MathUtils;
 
 public class Vector2D {
     public static final Vector2D Zero = new Vector2D(0, 0);
@@ -56,6 +55,29 @@ public class Vector2D {
         Recalculate();
     }
 
+    public float Dot(Vector2D other)
+    {
+        return (_x * other.x()) + (_y * other.y());
+    }
+
+    public double DistanceTo(Vector2D other) {
+        return this.subtract(other).magnitude();
+    }
+
+    public Vector2D NearestPoint(Vector2D start, Vector2D end)
+    {
+        Vector2D line = end.subtract(start);
+        double len = line.magnitude();
+        line.Normalize();
+
+        Vector2D v = this.subtract(start);
+        float d = v.Dot(line);
+
+        d = (float) MathUtils.clamp(d, 0f, len);
+
+        return start.add(line.multiply(d));
+    }
+
     public Vector2D add(Vector2D other) {
         return new Vector2D(
                 _x + other._x,
@@ -73,9 +95,14 @@ public class Vector2D {
         return new Vector2D(_x * val, _y * val);
     }
 
+    public Point2D toPoint() {
+        return new Point2D(Math.round(_x), Math.round(_y));
+    }
+
     @NonNull
     @Override
     public String toString() {
         return String.format("X: %s | Y: %s", _x, _y);
     }
+
 }
