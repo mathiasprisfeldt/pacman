@@ -19,6 +19,7 @@ public class GameWorld extends View {
     private boolean _isPaused;
     private long _lastTime = System.nanoTime();
 
+    private InGame _inGame;
     private MapBuilder _mapBuilder;
     private Map _map;
 
@@ -28,14 +29,35 @@ public class GameWorld extends View {
     private ArrayList<GameObject> _gameObjects = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToAdd = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToRemove = new ArrayList<>();
-    private VelocityTracker mVelocityTracker;
+    private VelocityTracker velocityTracker;
+    private Vector2D _dimensions;
+
+    public Vector2D getDimensions() {
+        return _dimensions;
+    }
+
+    public ArrayList<GameObject> getGameObjects() {
+        return _gameObjects;
+    }
+
+    public boolean getIsPaused() {
+        return _isPaused;
+    }
 
     public void setIsPaused(boolean _isPaused) {
         this._isPaused = _isPaused;
     }
 
     public GameWorld(Context context, AttributeSet attrs) {
-        super(context);
+        super(context, attrs);
+
+        GameManager.getInstance().setGameWorld(this);
+
+        _inGame = (InGame) context;
+        _mapBuilder = new MapBuilder(this);
+        _map = _mapBuilder.getMap();
+
+        SoundManager.getInstance().initialize(context);
 
         Timer _updateTimer = new Timer();
         _updateTimer.schedule(new TimerTask() {
@@ -44,19 +66,24 @@ public class GameWorld extends View {
                 onUpdate();
             }
         }, 0, 16);
+    }
 
-        _mapBuilder = new MapBuilder(this);
-        _map = _mapBuilder.getMap();
+    public void restartRound() {
+        for (int i = 0; i < _gameObjects.size(); i++) {
+            GameObject gameObject = _gameObjects.get(i);
+            gameObject.setIsActive(true);
+            gameObject.onReset();
+        }
     }
 
     public void onUpdate() {
-        if (_isPaused)
-            return;
-
         //Calculate deltatime
         long currTime = System.nanoTime();
         float deltaTime = ((currTime - _lastTime) / 1000000000f);
         _lastTime = currTime;
+
+        if (_isPaused)
+            return;
 
         //Remove gameobjects that were marked for removal last frame
         for (int i = 0; i < _gameObjectsToRemove.size(); i++) {
@@ -81,6 +108,7 @@ public class GameWorld extends View {
     }
 
     public void onDraw(Canvas canvas) {
+        _dimensions = new Vector2D(canvas.getWidth(), canvas.getHeight());
         _onDrawObjects = _gameObjects.toArray(_onDrawObjects);
         canvas.drawColor(getResources().getColor(R.color.game_world_bg_color));
 
@@ -90,6 +118,8 @@ public class GameWorld extends View {
             GameObject gameObject = _onDrawObjects[i];
             gameObject.onDraw(canvas);
         }
+
+        GameManager.getInstance().onUI(_inGame);
 
         super.onDraw(canvas);
     }
@@ -104,50 +134,44 @@ public class GameWorld extends View {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                if (mVelocityTracker == null) {
-                    mVelocityTracker = VelocityTracker.obtain();
+                if (velocityTracker == null) {
+                    velocityTracker = VelocityTracker.obtain();
                 } else {
-                    mVelocityTracker.clear();
+                    velocityTracker.clear();
                 }
 
-                mVelocityTracker.addMovement(event);
+                velocityTracker.addMovement(event);
 
                 for (int i = 0; i < _onTouchObjects.length; i++) {
                     GameObject gameObject = _onTouchObjects[i];
-                    gameObject.onTouchEvent(action, mVelocityTracker, Vector2D.Zero);
+                    gameObject.onTouchEvent(action, velocityTracker, Vector2D.Zero);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                mVelocityTracker.addMovement(event);
-                mVelocityTracker.computeCurrentVelocity(1000);
+                velocityTracker.addMovement(event);
+                velocityTracker.computeCurrentVelocity(1000);
 
                 for (int i = 0; i < _onTouchObjects.length; i++) {
                     GameObject gameObject = _onTouchObjects[i];
                     gameObject.onTouchEvent(
                             action,
-                            mVelocityTracker,
+                            velocityTracker,
                             new Vector2D(
-                                    mVelocityTracker.getXVelocity(pointerId),
-                                    mVelocityTracker.getYVelocity(pointerId)));
+                                    velocityTracker.getXVelocity(pointerId),
+                                    velocityTracker.getYVelocity(pointerId)));
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 for (int i = 0; i < _onTouchObjects.length; i++) {
                     GameObject gameObject = _onTouchObjects[i];
-                    gameObject.onTouchEvent(action, mVelocityTracker, Vector2D.Zero);
+                    gameObject.onTouchEvent(action, velocityTracker, Vector2D.Zero);
                 }
             case MotionEvent.ACTION_CANCEL:
-                mVelocityTracker.recycle();
-                mVelocityTracker = null;
+                velocityTracker.recycle();
+                velocityTracker = null;
                 break;
         }
         return true;
-    }
-
-    public void onReset() {
-        for (GameObject gameObject : _gameObjects) {
-            gameObject.onReset();
-        }
     }
 
     public void add(GameObject gameObject) {

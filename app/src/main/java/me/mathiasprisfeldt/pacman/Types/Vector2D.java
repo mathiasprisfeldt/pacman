@@ -64,6 +64,11 @@ public class Vector2D {
         return this.subtract(other).magnitude();
     }
 
+    public static Vector2D Lerp(Vector2D point1, Vector2D point2, float alpha)
+    {
+        return point1.add(point2.subtract(point1).multiply(alpha));
+    }
+
     public Vector2D NearestPoint(Vector2D start, Vector2D end)
     {
         Vector2D line = end.subtract(start);
@@ -99,10 +104,13 @@ public class Vector2D {
         return new Point2D(Math.round(_x), Math.round(_y));
     }
 
+    public Vector2D copy() {
+        return new Vector2D(_x, _y);
+    }
+
     @NonNull
     @Override
     public String toString() {
         return String.format("X: %s | Y: %s", _x, _y);
     }
-
 }

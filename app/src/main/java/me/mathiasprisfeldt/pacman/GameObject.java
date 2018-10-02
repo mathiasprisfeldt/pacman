@@ -4,10 +4,12 @@ import android.graphics.Canvas;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import me.mathiasprisfeldt.pacman.Components.Component;
 import me.mathiasprisfeldt.pacman.Components.Transform;
+import me.mathiasprisfeldt.pacman.Interfaces.Collideable;
 import me.mathiasprisfeldt.pacman.Interfaces.Drawable;
 import me.mathiasprisfeldt.pacman.Interfaces.Resetable;
 import me.mathiasprisfeldt.pacman.Interfaces.Touchable;
@@ -18,6 +20,16 @@ public class GameObject {
     private ArrayList<Component> _components = new ArrayList<>();
     private GameWorld _gameWorld;
     private Transform _transform;
+    private boolean _isActive = true;
+    private String _tag;
+
+    public boolean isActive() {
+        return _isActive;
+    }
+
+    public void setIsActive(boolean _isActive) {
+        this._isActive = _isActive;
+    }
 
     public GameWorld getGameWorld() {
         return _gameWorld;
@@ -27,9 +39,11 @@ public class GameObject {
         return _transform;
     }
 
-    public GameObject(GameWorld gameWorld) {
+    public GameObject(GameWorld gameWorld, String tag) {
         _gameWorld = gameWorld;
         _gameWorld.add(this);
+
+        _tag = tag;
 
         addComponent(_transform = new Transform(this, 0, 0));
     }
@@ -47,14 +61,28 @@ public class GameObject {
         return component;
     }
 
-    <T extends Component> T getComponent(Class<T> type) {
+    public <T extends Component> T getComponent(Class<T> type) {
         for (int i = 0; i < _components.size(); i++) {
             Component component = _components.get(i);
+
             if (type.isInstance(component))
                 return (T) component;
         }
 
         return null;
+    }
+
+    public <T> T[] getComponents(Class<T> type) {
+        T[] components = (T[]) Array.newInstance(type, _components.size());
+
+        for (int i = 0; i < _components.size(); i++) {
+            Component component = _components.get(i);
+
+            if (type.isInstance(component))
+                components[i] = (T) component;
+        }
+
+        return components;
     }
 
     public void destroy() {
@@ -69,6 +97,9 @@ public class GameObject {
     }
 
     public void onDraw(Canvas canvas) {
+        if (!isActive())
+            return;
+
         for (int i = 0; i < _components.size(); i++) {
             Component component = _components.get(i);
             if (component instanceof Drawable)
@@ -85,14 +116,20 @@ public class GameObject {
     }
 
     public void onUpdate(float deltaTime) {
+        if (!isActive())
+            return;
+
         for (int i = 0; i < _components.size(); i++) {
             Component component = _components.get(i);
             if (component instanceof Updateable)
-                component.onUpdate(deltaTime);
+                ((Updateable) component).onUpdate(deltaTime);
         }
     }
 
     public void onTouchEvent(int action, VelocityTracker velTracker, Vector2D vel) {
+        if (!isActive())
+            return;
+
         for (int i = 0; i < _components.size(); i++) {
             Component component = _components.get(i);
             if (component instanceof Touchable) {
@@ -111,5 +148,9 @@ public class GameObject {
                 }
             }
         }
+    }
+
+    public boolean compareTag(String tag) {
+        return _tag == tag;
     }
 }

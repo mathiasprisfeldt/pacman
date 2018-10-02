@@ -4,10 +4,11 @@ import android.graphics.Matrix;
 import android.util.Log;
 
 import me.mathiasprisfeldt.pacman.GameObject;
+import me.mathiasprisfeldt.pacman.Interfaces.Resetable;
 import me.mathiasprisfeldt.pacman.Interfaces.Updateable;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
-public class Transform extends Component implements Updateable {
+public class Transform extends Component implements Updateable, Resetable {
 
     private Matrix _matrix = new Matrix();
 
@@ -15,9 +16,15 @@ public class Transform extends Component implements Updateable {
     private Vector2D _position = new Vector2D(0, 0);
     private Vector2D _scale = new Vector2D(1, 1);
     private Vector2D _velocity = new Vector2D(0, 0);
+    private float _rotation;
 
     public Matrix getMatrix() {
         return _matrix;
+    }
+
+    public void setRotation(float _rotation) {
+        this._rotation = _rotation;
+        updateMatrix();
     }
 
     public void setOffset(Vector2D offset) {
@@ -30,7 +37,7 @@ public class Transform extends Component implements Updateable {
     }
 
     public void setPosition(Vector2D pos) {
-        _position = pos;
+        _position = pos.copy();
         updateMatrix();
     }
 
@@ -46,6 +53,7 @@ public class Transform extends Component implements Updateable {
     public void updateMatrix() {
         _matrix.setTranslate(_position.x() + _offset.x(), _position.y() + _offset.y());
         _matrix.postScale(_scale.x(), _scale.y());
+        _matrix.postRotate(_rotation, _position.x(), _position.y());
     }
 
     public Transform(GameObject gameObject, float x, float y) {
@@ -58,5 +66,11 @@ public class Transform extends Component implements Updateable {
     public void onUpdate(float deltaTime) {
         setPosition(_position.add(_velocity.multiply(deltaTime)));
         _velocity = new Vector2D(0, 0);
+    }
+
+    @Override
+    public void onReset() {
+        _velocity = Vector2D.Zero;
+        setRotation(0);
     }
 }

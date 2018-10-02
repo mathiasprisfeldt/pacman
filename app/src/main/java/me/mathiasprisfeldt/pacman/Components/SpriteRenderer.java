@@ -7,11 +7,13 @@ import android.graphics.Paint;
 
 import me.mathiasprisfeldt.pacman.GameObject;
 import me.mathiasprisfeldt.pacman.Interfaces.Drawable;
+import me.mathiasprisfeldt.pacman.Interfaces.Resetable;
 import me.mathiasprisfeldt.pacman.Types.Point2D;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
-public class SpriteRenderer extends Component implements Drawable {
+public class SpriteRenderer extends Component implements Drawable, Resetable {
 
+    private Bitmap _originalBitmap;
     private Bitmap _bitmap;
     private Paint _paint = new Paint();
     private Vector2D _pivot;
@@ -25,7 +27,14 @@ public class SpriteRenderer extends Component implements Drawable {
         _bitmap = BitmapFactory.decodeResource(_gameObject.getGameWorld().getResources(), bitmapId);
     }
 
-    private void setSize(int width, int height) {
+    public void setBitmap(Bitmap bitmap) {
+        if (bitmap == null)
+            return;
+
+        _bitmap = bitmap;
+    }
+
+    public void setSizePixels(int width, int height) {
         _size = new Point2D(width, height);
 
         float widthScale = (float) _size.x() / _bitmap.getWidth();
@@ -34,7 +43,7 @@ public class SpriteRenderer extends Component implements Drawable {
         _gameObject.getTransform().setScale(new Vector2D(widthScale, heightScale));
     }
 
-    private void setSize(float width, float height) {
+    public void setSize(float width, float height) {
         float bitmapWidth = width * _bitmap.getWidth();
         float bitmapHeight = height * _bitmap.getHeight();
 
@@ -57,21 +66,36 @@ public class SpriteRenderer extends Component implements Drawable {
 
     public SpriteRenderer(GameObject gameObject, int bitmap, int width, int height) {
         super(gameObject);
+        setupPaint();
         setBitmap(bitmap);
-        setSize(width, height);
+        _originalBitmap = _bitmap;
+        setSizePixels(width, height);
         setPivot(new Vector2D(0.5f, 0.5f));
     }
 
     public SpriteRenderer(GameObject gameObject, int bitmap) {
         super(gameObject);
         setBitmap(bitmap);
+        _originalBitmap = _bitmap;
         setSize(1f, 1f);
         setPivot(new Vector2D(0.5f, 0.5f));
+        setupPaint();
+    }
+
+    public void setupPaint() {
+        _paint.setFilterBitmap(false);
+        _paint.setAntiAlias(false);
+        _paint.setDither(true);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         Transform tr = _gameObject.getTransform();
         canvas.drawBitmap(_bitmap, tr.getMatrix(), _paint);
+    }
+
+    @Override
+    public void onReset() {
+        setBitmap(_originalBitmap);
     }
 }

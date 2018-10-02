@@ -5,9 +5,14 @@ import android.support.v4.math.MathUtils;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class Edge {
+    private double _length;
     private Node _from;
     private Node _to;
     private CardinalDirection _dir;
+
+    public double getLength() {
+        return _length;
+    }
 
     public Node getFrom() {
         return _from;
@@ -25,6 +30,7 @@ public class Edge {
         _from = from;
         _to = to;
         _dir = dir;
+        _length = from.getPosition().DistanceTo(_to.getPosition());
     }
 
     public Vector2D Clamp(Vector2D other) {
@@ -40,5 +46,9 @@ public class Edge {
         return new Vector2D(
                 MathUtils.clamp(other.x(), minX, maxX),
                 MathUtils.clamp(other.y(), minY, maxY));
+    }
+
+    public Vector2D getPosition(float alpha) {
+        return Vector2D.Lerp(_from.getPosition(), _to.getPosition(), alpha);
     }
 }

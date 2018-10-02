@@ -1,11 +1,25 @@
 package me.mathiasprisfeldt.pacman.Map;
 
+import android.support.v4.content.res.TypedArrayUtils;
+
+import java.lang.reflect.Array;
+
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class Node {
+    private int _directionCount;
+    private CardinalDirection[] _validDirections = new CardinalDirection[4];
     private Edge[] _edges = new Edge[4];
     private Vector2D _position;
     private double _radius = 10;
+
+    public int getDirectionCount() {
+        return _directionCount;
+    }
+
+    public CardinalDirection[] getValidDirections() {
+        return _validDirections;
+    }
 
     public double getRadius() {
         return _radius;
@@ -32,8 +46,12 @@ public class Node {
     }
 
     private void addEdge(Edge edge, CardinalDirection dir) {
-        if (dir != CardinalDirection.None)
-            _edges[dir.getIndex()] = edge;
+        if (dir != CardinalDirection.None) {
+            int index = dir.getIndex();
+            _edges[index] = edge;
+            _validDirections[index] = dir;
+            _directionCount++;
+        }
     }
 
     public Edge getEdge(CardinalDirection dir) {
