@@ -65,7 +65,7 @@ public class Transform extends Component implements Updateable, Resetable {
     @Override
     public void onUpdate(float deltaTime) {
         setPosition(_position.add(_velocity.multiply(deltaTime)));
-        _velocity = new Vector2D(0, 0);
+        _velocity = Vector2D.Zero;
     }
 
     @Override

@@ -2,6 +2,8 @@ package me.mathiasprisfeldt.pacman.Components;
 
 import android.content.res.Resources;
 
+import java.util.ArrayList;
+
 import me.mathiasprisfeldt.pacman.GameObject;
 import me.mathiasprisfeldt.pacman.Interfaces.Collideable;
 import me.mathiasprisfeldt.pacman.Interfaces.Resetable;
@@ -18,6 +20,7 @@ public class Pawn extends Component implements Updateable, Resetable {
     private Edge _currEdge;
     private Node _spawnPoint;
 
+    Node _lastNode;
     Node _currNode;
     SpriteRenderer _renderer;
     CardinalDirection _direction = CardinalDirection.None;
@@ -46,6 +49,9 @@ public class Pawn extends Component implements Updateable, Resetable {
 
         transform.setVelocity(_direction.toVector().multiply(_speed));
 
+        if (_currEdge != null)
+            transform.setPosition(pos = _currEdge.Clamp(pos));
+
         if (_currNode != null && !_currNode.isColliding(pos))
             _currNode = null;
 
@@ -54,6 +60,7 @@ public class Pawn extends Component implements Updateable, Resetable {
               if (_currNode == null)
                   onNewNode(node);
 
+              _lastNode = _currNode;
               _currNode = node;
 
               if (_queuedDir != CardinalDirection.None)
@@ -64,9 +71,6 @@ public class Pawn extends Component implements Updateable, Resetable {
               _queuedDir = CardinalDirection.None;
           }
         }
-
-        if (_currEdge != null)
-            transform.setPosition(_currEdge.Clamp(pos));
     }
 
     void onNewDirection(CardinalDirection dir) {
@@ -93,6 +97,7 @@ public class Pawn extends Component implements Updateable, Resetable {
     public void onReset() {
         _currNode = null;
         _currEdge = null;
+        _lastNode = null;
         _direction = CardinalDirection.None;
         _queuedDir = CardinalDirection.None;
 

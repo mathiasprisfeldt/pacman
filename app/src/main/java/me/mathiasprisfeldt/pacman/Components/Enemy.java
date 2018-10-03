@@ -68,12 +68,11 @@ public class Enemy extends Pawn {
         _lastDirInverted = _direction.invert();
         if (_lastDirInverted != CardinalDirection.None && validDirCount > 1) {
             directions[_lastDirInverted.getIndex()] = null;
-            directions = ArrayExtensions.Trim(CardinalDirection.class, directions);
             validDirCount--;
         }
+        directions = ArrayExtensions.Trim(CardinalDirection.class, directions);
 
         int randomIndex = _random.nextInt(validDirCount);
-
         _direction = directions[randomIndex];
     }
 

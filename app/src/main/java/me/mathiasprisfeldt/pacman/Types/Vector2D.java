@@ -7,7 +7,11 @@ public class Vector2D {
     public static final Vector2D Zero = new Vector2D(0, 0);
     private float _x;
     private float _y;
+
+    private boolean _isSqrMagCalced;
     private double _sqrMagnitude;
+
+    private boolean _isMagCalced;
     private double _magnitude;
 
     public float x() {
@@ -19,31 +23,35 @@ public class Vector2D {
     }
 
     public double sqrMagnitude() {
+        if (!_isSqrMagCalced) {
+            _sqrMagnitude = Math.pow(_x, 2) + Math.pow(_y, 2);
+            _isSqrMagCalced = true;
+        }
+
         return _sqrMagnitude;
     }
 
     public double magnitude() {
+        if (!_isMagCalced) {
+            _magnitude = Math.sqrt(Math.pow(_x, 2) + Math.pow(_y, 2));
+            _isMagCalced = true;
+        }
+
         return _magnitude;
     }
 
     public Vector2D(float _x, float _y) {
         this._x = _x;
         this._y = _y;
-
-        Recalculate();
-    }
-
-    private void Recalculate() {
-        _sqrMagnitude = Math.pow(_x, 2) + Math.pow(_y, 2);
-        _magnitude = Math.sqrt(Math.pow(_x, 2) + Math.pow(_y, 2));
     }
 
     public void Normalize() {
-        float val = (float) (1f / _magnitude);
+        float val = (float) (1f / magnitude());
         _x *= val;
         _y *= val;
 
-        Recalculate();
+        _isMagCalced = false;
+        _isSqrMagCalced = false;
     }
 
     public void ToCardinal() {
@@ -52,7 +60,17 @@ public class Vector2D {
         else
             _x = 0;
 
-        Recalculate();
+        _isMagCalced = false;
+        _isSqrMagCalced = false;
+    }
+
+    public boolean RadiusIntersect(Vector2D other, float otherRad, float ourRadius)
+    {
+        float dx = other.x() - x();
+        float dy = other.y() - y();
+        float radii = ourRadius + otherRad;
+
+        return (dx * dx) + (dy * dy) < radii * radii;
     }
 
     public float Dot(Vector2D other)

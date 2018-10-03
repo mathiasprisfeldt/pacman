@@ -133,7 +133,6 @@ public class GameWorld extends View {
         _canvasMatrix = new Matrix();
 
         Vector2D mapSize = _map.getMapSize();
-        float bgRatio = mapSize.y() / mapSize.x();
         float bgWidth = mapSize.x();
         float bgHeight = mapSize.y();
         float x;

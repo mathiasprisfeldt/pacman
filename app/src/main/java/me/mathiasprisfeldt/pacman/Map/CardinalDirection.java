@@ -16,6 +16,22 @@ public enum CardinalDirection {
         _index = i;
     }
 
+    public static CardinalDirection fromInt(int index) {
+        switch (index)
+        {
+            case 0:
+               return Left;
+            case 1:
+               return Up;
+            case 2:
+               return Right;
+            case 3:
+               return Down;
+        }
+
+        return None;
+    }
+
     public static CardinalDirection fromPoint(Point2D vel) {
         if (vel.x() == -1)
             return Left;

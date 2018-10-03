@@ -2,7 +2,6 @@ package me.mathiasprisfeldt.pacman;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 
 public class SoundManager {

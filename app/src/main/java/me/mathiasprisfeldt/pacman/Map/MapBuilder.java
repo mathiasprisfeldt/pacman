@@ -29,8 +29,8 @@ public class MapBuilder {
         _map = new Map(gameWorld);
 
         BuildCoins();
-//        BuildPacman();
-//        BuildEnemies();
+        BuildPacman();
+        BuildEnemies();
     }
 
     private void BuildEnemies() {
@@ -74,7 +74,7 @@ public class MapBuilder {
                 new SpriteRenderer(enemyGo, image));
 
         Enemy enemy = enemyGo.addComponent(new Enemy(enemyGo, renderer, _map.getEnemySpawnPoint(), _map, speed));
-        enemyGo.addComponent(new CircleCollider(enemyGo, false, 10));
+        enemyGo.addComponent(new CircleCollider(enemyGo, true, 10));
 
         return enemy;
     }

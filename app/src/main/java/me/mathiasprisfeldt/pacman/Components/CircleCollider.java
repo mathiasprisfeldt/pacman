@@ -1,5 +1,6 @@
 package me.mathiasprisfeldt.pacman.Components;
 
+import android.graphics.Point;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -41,9 +42,8 @@ public class CircleCollider extends Component implements Updateable {
                 continue;
 
             Vector2D otherPos = gameObject.getTransform().getPosition();
-            Vector2D ourPos = _transform.getPosition();
 
-            if (ourPos.DistanceTo(otherPos) <= _radius + otherCollider.getRadius())
+            if (_transform.getPosition().RadiusIntersect(otherPos, otherCollider.getRadius(), _radius))
                 notifyListeners(gameObject);
         }
     }

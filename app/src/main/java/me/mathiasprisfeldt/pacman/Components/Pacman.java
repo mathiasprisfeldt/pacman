@@ -60,7 +60,7 @@ public class Pacman extends Pawn implements Touchable, Collideable {
 
     @Override
     public void touchMove(VelocityTracker velTracker, Vector2D vel) {
-        if (vel.sqrMagnitude() > 2000000) {
+        if (vel.sqrMagnitude() > 500000) {
             vel.Normalize();
             vel.ToCardinal();
 
