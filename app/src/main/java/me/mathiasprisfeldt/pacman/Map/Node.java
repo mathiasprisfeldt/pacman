@@ -1,10 +1,6 @@
 package me.mathiasprisfeldt.pacman.Map;
 
-import android.support.v4.content.res.TypedArrayUtils;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Map;
 
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
@@ -15,6 +11,33 @@ public class Node {
     private Edge[] _edges = new Edge[4];
     private Vector2D _position;
     private float _radius = 10;
+    private boolean _spawnCoins = true;
+    private Node _portalEnd;
+    private boolean _bigCoin;
+
+    public boolean isBigCoin() {
+        return _bigCoin;
+    }
+
+    public void setBigCoin(boolean _bigCoin) {
+        this._bigCoin = _bigCoin;
+    }
+
+    public Node getPortalEnd() {
+        return _portalEnd;
+    }
+
+    public void setPortalEnd(Node value) {
+        _portalEnd = value;
+    }
+
+    public boolean getSpawnCoins() {
+        return _spawnCoins;
+    }
+
+    public void setSpawnCoins(boolean value) {
+        _spawnCoins = value;
+    }
 
     public ArrayList<Node> getNeighbors() {
         if (_neighborNodes == null) {

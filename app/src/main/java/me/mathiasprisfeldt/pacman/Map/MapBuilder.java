@@ -29,8 +29,8 @@ public class MapBuilder {
         _map = new Map(gameWorld);
 
         BuildCoins();
-        BuildPacman();
         BuildEnemies();
+        BuildPacman();
     }
 
     private void BuildEnemies() {
@@ -40,7 +40,7 @@ public class MapBuilder {
                 R.drawable.enemy_red_right,
                 R.drawable.enemy_red_down
         };
-        BuildEnemy(R.drawable.enemy_red_right, 500).setImages(red);
+        BuildEnemy(R.drawable.enemy_red_right, 400).setImages(red);
 
         int[] blue = new int[] {
                 R.drawable.enemy_blue_left,
@@ -56,7 +56,7 @@ public class MapBuilder {
                 R.drawable.enemy_orange_right,
                 R.drawable.enemy_orange_down
         };
-        BuildEnemy(R.drawable.enemy_orange_right, 100).setImages(orange);
+        BuildEnemy(R.drawable.enemy_orange_right, 150).setImages(orange);
 
         int[] pink = new int[] {
                 R.drawable.enemy_pink_left,
@@ -83,19 +83,24 @@ public class MapBuilder {
         int amountOfCoins = 0;
 
         for (Node node : _map.getNodes()) {
-            if (node == _map.getPacmanSpawnPoint())
+            if (node == _map.getPacmanSpawnPoint() ||
+                !node.getSpawnCoins())
                 continue;
 
-            BuildCoin(node.getPosition());
+            BuildCoin(node.getPosition(), node.isBigCoin());
             amountOfCoins++;
         }
 
         for (Edge edge : _map.getEdges()) {
+            if (!edge.getFrom().getSpawnCoins() ||
+                !edge.getTo().getSpawnCoins())
+                continue;
+
             double edgeLength = edge.getLength();
             int coinAmount = Math.round((float) edgeLength / COIN_SPACE);
 
             for (int i = 1; i < coinAmount; i++) {
-                BuildCoin(edge.getPosition((float) i / coinAmount));
+                BuildCoin(edge.getPosition((float) i / coinAmount), false);
                 amountOfCoins++;
             }
         }
@@ -103,13 +108,21 @@ public class MapBuilder {
         GameManager.getInstance().setCoinAmount(amountOfCoins);
     }
 
-    private Coin BuildCoin(Vector2D pos) {
-        GameObject newCoin = new GameObject(_gameWorld, "COIN");
+    private Coin BuildCoin(Vector2D pos, boolean isBig) {
+        GameObject newCoin = new GameObject(_gameWorld, isBig ? "BIGCOIN" : "COIN");
 
         SpriteRenderer renderer = newCoin.addComponent(
-                new SpriteRenderer(newCoin, R.drawable.coin));
+                new SpriteRenderer(newCoin, isBig ? R.drawable.powerup : R.drawable.coin));
 
-        newCoin.addComponent(new CircleCollider(newCoin, false, 5));
+        if (isBig) {
+            int[] images = new int[] {
+                    R.drawable.powerup,
+                    R.drawable.powerup_1
+            };
+            newCoin.addComponent(new Animator(newCoin, renderer, images, 4));
+        }
+
+        newCoin.addComponent(new CircleCollider(newCoin, true, 20));
 
         Coin coin = new Coin(newCoin);
         newCoin.addComponent(coin);
@@ -132,7 +145,7 @@ public class MapBuilder {
         };
         Animator animator = newPacman.addComponent(new Animator(newPacman, renderer, frames, 10));
 
-        newPacman.addComponent(new Pacman(newPacman, renderer, animator, _map.getPacmanSpawnPoint(), _map, 600));
+        newPacman.addComponent(new Pacman(newPacman, renderer, animator, _map.getPacmanSpawnPoint(), _map, 400));
         newPacman.addComponent(new CircleCollider(newPacman, false, 10));
     }
 }

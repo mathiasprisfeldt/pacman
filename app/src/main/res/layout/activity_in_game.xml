@@ -14,20 +14,57 @@
         android:layout_marginEnd="8dp"
         android:text="LIVES"
         android:textAlignment="center"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/in_game_highscore"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/in_game_live_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/eightbit"
+        android:textSize="12sp"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="@+id/in_game_live"
+        app:layout_constraintStart_toStartOf="@+id/in_game_live"
+        app:layout_constraintTop_toBottomOf="@+id/in_game_live" />
+
+    <TextView
         android:id="@+id/in_game_highscore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:text="HIGH SCORE"
+        android:textAlignment="center"
+        android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/in_game_highscore_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/eightbit"
+        android:textSize="12sp"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="@+id/in_game_highscore"
+        app:layout_constraintStart_toStartOf="@+id/in_game_highscore"
+        app:layout_constraintTop_toBottomOf="@+id/in_game_highscore" />
+
+    <TextView
+        android:id="@+id/in_game_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/eightbit"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:text="[STATUS]"
+        app:layout_constraintEnd_toEndOf="@+id/in_game_highscore_txt"
+        app:layout_constraintStart_toStartOf="@+id/in_game_highscore_txt"
+        app:layout_constraintTop_toBottomOf="@+id/in_game_highscore_txt" />
 
     <TextView
         android:id="@+id/in_game_score"
@@ -36,22 +73,37 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="SCORE"
+        android:textSize="20sp"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@+id/in_game_highscore"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/in_game_score_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/eightbit"
+        android:textSize="12sp"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="@+id/in_game_score"
+        app:layout_constraintStart_toStartOf="@+id/in_game_score"
+        app:layout_constraintTop_toBottomOf="@+id/in_game_score" />
+
+
     <me.mathiasprisfeldt.pacman.GameWorld
         android:id="@+id/game_world"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/in_game_reset"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/in_game_highscore" />
+        app:layout_constraintTop_toBottomOf="@+id/in_game_status" />
 
     <Button
         android:id="@+id/in_game_pause"
@@ -61,6 +113,8 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         android:text="PAUSE"
+        android:backgroundTint="#17173c"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.75"
@@ -74,6 +128,8 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         android:text="RESET"
+        android:backgroundTint="#17173c"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/in_game_pause"
         app:layout_constraintStart_toStartOf="parent" />

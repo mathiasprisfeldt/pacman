@@ -11,19 +11,27 @@ public class GameManager {
     }
 
     private GameWorld _gameWorld;
-    private int _lives = 3;
+    private int _lives;
     private int _coins;
     private int _maxCoins;
     private int _score;
+    private int highscore;
     private boolean _gameover;
+    private String _statusTxt;
+
+    public void setStatusTxt(String _statusTxt) {
+        this._statusTxt = _statusTxt;
+    }
 
     public void setGameWorld(GameWorld _gameWorld) {
         this._gameWorld = _gameWorld;
+        highscore = _gameWorld.getContext().getSharedPreferences("pacman", Context.MODE_PRIVATE).getInt("highscore", 0);
+        resetGame();
     }
 
-    public void addCoin() {
+    public void addCoin(int score) {
         _coins++;
-        _score += 10;
+        set_score(_score + score);
 
         if (_coins >= _maxCoins) {
             roundWon();
@@ -44,43 +52,75 @@ public class GameManager {
     }
 
     public void onUI(InGame inGame) {
-        TextView scoreTxt = inGame.findViewById(R.id.in_game_score);
-        scoreTxt.setText("SCORE\n" + getScore());
+        TextView scoreTxt = inGame.findViewById(R.id.in_game_score_txt);
+        scoreTxt.setText(String.valueOf(getScore()));
 
-        TextView livesTxt = inGame.findViewById(R.id.in_game_live);
-        livesTxt.setText("LIVES\n" + _lives);
+        TextView livesTxt = inGame.findViewById(R.id.in_game_live_txt);
+        livesTxt.setText(String.valueOf(_lives));
+
+        TextView highscoreTxt = inGame.findViewById(R.id.in_game_highscore_txt);
+        highscoreTxt.setText(String.valueOf(highscore));
+
+        TextView statusTxt = inGame.findViewById(R.id.in_game_status);
+        statusTxt.setText(_statusTxt);
     }
 
-    public void restartRound() {
+    public void restartRound(boolean clearCoins) {
         if (_gameover) {
             _gameWorld.setIsPaused(true);
+            saveHighscore();
             return;
         }
 
-        _coins = 0;
-        _gameWorld.restartRound();
+        _coins = _gameover ? 0 : _coins;
+        _gameWorld.restartRound(_gameover || clearCoins);
+        _gameWorld.startCountdown();
     }
 
     private void roundWon() {
-        _score += 1000;
-        restartRound();
+        set_score(_score + 500);
+        _coins = 0;
+        restartRound(true);
     }
 
     public void onPacmanDied() {
+        SoundManager.getInstance().playSound(SoundManager.death);
         _lives--;
 
-        if (_lives <= 0)
+        if (_lives <= 0) {
             _gameover = true;
+            _statusTxt = "GAMEOVER!";
+        }
 
-        restartRound();
+        restartRound(false);
     }
 
     public void resetGame() {
+        saveHighscore();
+
         _gameover = false;
         _gameWorld.setIsPaused(false);
 
-        _score = 0;
+        set_score(0);
         _lives = 3;
-        restartRound();
+        _coins = 0;
+        restartRound(true);
+    }
+
+    public void saveHighscore() {
+        if (_score < highscore)
+            return;
+
+        _statusTxt = "NEW HIGHSCORE!";
+
+        _gameWorld.getContext().getSharedPreferences("pacman", Context.MODE_PRIVATE)
+                .edit().putInt("highscore", highscore =_score).apply();
+    }
+
+    public void set_score(int _score) {
+        this._score = _score;
+
+        if (_score > highscore)
+            highscore = _score;
     }
 }

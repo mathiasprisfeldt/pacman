@@ -8,19 +8,22 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pacman"
-        android:textSize="64sp"/>
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"/>
 
     <Button
         android:id="@+id/main_menu_start_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Game"
-        android:layout_marginTop="10dp"
+        android:backgroundTint="#17173c"
         android:paddingLeft="25dp"
-        android:paddingRight="25dp"/>
+        android:paddingRight="25dp"
+        android:text="Start Game"
+        android:textSize="24sp" />
 
 </LinearLayout>

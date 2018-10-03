@@ -153,4 +153,15 @@ public class GameObject {
     public boolean compareTag(String tag) {
         return _tag == tag;
     }
+
+    public boolean compareTag(String... tag) {
+        boolean valid = false;
+
+        for (int i = 0; i < tag.length; i++) {
+            if (_tag == tag[i])
+                valid = true;
+        }
+
+        return valid;
+    }
 }

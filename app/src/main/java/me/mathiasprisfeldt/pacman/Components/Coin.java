@@ -13,10 +13,6 @@ public class Coin extends Component implements Collideable {
 
     @Override
     public void OnCollisionEnter(GameObject other) {
-        if (other.compareTag("PLAYER")) {
-            _gameObject.setIsActive(false);
-            SoundManager.getInstance().playEatSound();
-            GameManager.getInstance().addCoin();
-        }
+
     }
 }

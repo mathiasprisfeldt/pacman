@@ -50,4 +50,10 @@ public class InGame extends AppCompatActivity {
         if (_gameWorld != null)
             _gameWorld.setIsPaused(false);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        GameManager.getInstance().saveHighscore();
+    }
 }

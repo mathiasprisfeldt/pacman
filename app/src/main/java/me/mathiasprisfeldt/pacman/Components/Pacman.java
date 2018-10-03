@@ -14,6 +14,7 @@ import me.mathiasprisfeldt.pacman.Map.CardinalDirection;
 import me.mathiasprisfeldt.pacman.Map.Edge;
 import me.mathiasprisfeldt.pacman.Map.Map;
 import me.mathiasprisfeldt.pacman.Map.Node;
+import me.mathiasprisfeldt.pacman.SoundManager;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class Pacman extends Pawn implements Touchable, Collideable {
@@ -78,6 +79,18 @@ public class Pacman extends Pawn implements Touchable, Collideable {
         if (other.compareTag("ENEMY")) {
             _gameObject.setIsActive(false);
             GameManager.getInstance().onPacmanDied();
+        }
+
+        if (other.compareTag("COIN")) {
+            other.setIsActive(false);
+            SoundManager.getInstance().playEatSound();
+            GameManager.getInstance().addCoin(10);
+        }
+
+        if (other.compareTag("BIGCOIN")) {
+            other.setIsActive(false);
+            SoundManager.getInstance().playEatSound();
+            GameManager.getInstance().addCoin(50);
         }
     }
 

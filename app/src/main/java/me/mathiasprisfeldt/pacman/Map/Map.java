@@ -118,12 +118,12 @@ public class Map {
         _columnsOffsets[10] = new Vector2D(5, 0);
         _columnsOffsets[14] = new Vector2D(-10, 0);
 
-        Node plySpawn = CreateNode(0, 0); //0
-        CreateNode(3, 0); //1
-        CreateNode(6, 0); //2
-        CreateNode(8, 0); //3
-        CreateNode(12, 0); //4
-        CreateNode(15, 0); //5
+        CreateNode(0, 0).setBigCoin(true);
+        CreateNode(3, 0);
+        CreateNode(6, 0);
+        CreateNode(8, 0);
+        CreateNode(12, 0);
+        CreateNode(15, 0).setBigCoin(true);
 
         CreateNode(0, 2);
         CreateNode(3, 2);
@@ -141,19 +141,21 @@ public class Map {
         CreateNode(8, 4);
         CreateNode(10, 4);
         CreateNode(12, 4);
-        Node enemySpawn = CreateNode(15, 4);
+        CreateNode(15, 4);
 
         CreateNode(5, 5);
         CreateNode(6, 5);
         CreateNode(8, 5);
         CreateNode(10, 5);
 
-        CreateNode(0, 7);
+        Node portalLeft = CreateNode(0, 7);
         CreateNode(3, 7);
         CreateNode(5, 7);
         CreateNode(10, 7);
         CreateNode(12, 7);
-        CreateNode(15, 7);
+        Node portalRight = CreateNode(15, 7);
+        portalLeft.setPortalEnd(portalRight);
+        portalRight.setPortalEnd(portalLeft);
 
         CreateNode(5, 9);
         CreateNode(10, 9);
@@ -167,7 +169,7 @@ public class Map {
         CreateNode(12, 10);
         CreateNode(15, 10);
 
-        CreateNode(0, 12);
+        CreateNode(0, 12).setBigCoin(true);
         CreateNode(1, 12);
         CreateNode(3, 12);
         CreateNode(5, 12);
@@ -176,7 +178,7 @@ public class Map {
         CreateNode(10, 12);
         CreateNode(12, 12);
         CreateNode(14, 12);
-        CreateNode(15, 12);
+        CreateNode(15, 12).setBigCoin(true);
 
         CreateNode(0, 13);
         CreateNode(1, 13);
@@ -196,9 +198,12 @@ public class Map {
 
         //Middle enemy spawn
         CreateNode(7, 5);
-        CreateNode(6, 7);
-        CreateNode(7, 7);
-        CreateNode(8, 7);
+        CreateNode(6, 7).setSpawnCoins(false);
+        _enemySpawnPoint = CreateNode(7, 7);
+        _enemySpawnPoint.setSpawnCoins(false);
+        CreateNode(8, 7).setSpawnCoins(false);
+
+        _pacmanSpawnPoint = CreateNode(7, 12); //Node for pacman spawnpoint
 
         CreateConnection(0, 1, 2);
         CreateConnection(0, 6, 3);
@@ -275,7 +280,8 @@ public class Map {
         CreateConnection(42, 43, 2);
         CreateConnection(44, 45, 2);
         CreateConnection(45, 46, 2);
-        CreateConnection(46, 47, 2);
+        CreateConnection(46, 70, 2);
+        CreateConnection(70, 47, 2);
         CreateConnection(47, 48, 2);
         CreateConnection(48, 49, 2);
         CreateConnection(50, 51, 2);
@@ -300,9 +306,6 @@ public class Map {
         CreateConnection(56, 63, 3);
         CreateConnection(57, 64, 3);
         CreateConnection(61, 65, 3);
-
-        _pacmanSpawnPoint = plySpawn;
-        _enemySpawnPoint = enemySpawn;
     }
 
     private void CreateMap1() {

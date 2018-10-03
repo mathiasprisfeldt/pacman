@@ -33,7 +33,7 @@ public class CircleCollider extends Component implements Updateable {
         for (int i = 0; i < gameObjects.size(); i++) {
             GameObject gameObject = gameObjects.get(i);
 
-            if (gameObject == _gameObject)
+            if (gameObject == _gameObject || !gameObject.isActive())
                 continue;
 
             CircleCollider otherCollider = gameObject.getComponent(CircleCollider.class);

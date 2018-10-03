@@ -3,8 +3,9 @@ package me.mathiasprisfeldt.pacman;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.DrawFilter;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -19,8 +20,15 @@ import me.mathiasprisfeldt.pacman.Map.MapBuilder;
 import me.mathiasprisfeldt.pacman.Types.Vector2D;
 
 public class GameWorld extends View {
+    private boolean _doCountdown;
+    private float _countdowner;
+    private float _counterdownerDuration;
+    private float _normalCountdownDuration = 2;
+    private float _initialCountdownDuration = 4;
+
     private boolean _isPaused;
     private long _lastTime = System.nanoTime();
+    private float _deltaTime;
 
     private InGame _inGame;
     private MapBuilder _mapBuilder;
@@ -36,8 +44,18 @@ public class GameWorld extends View {
     private ArrayList<GameObject> _gameObjectsToRemove = new ArrayList<>();
     private VelocityTracker velocityTracker;
 
+    private int _lastOrientation;
+
     public ArrayList<GameObject> getGameObjects() {
         return _gameObjects;
+    }
+
+    public boolean isCountdowning() {
+        return _doCountdown;
+    }
+
+    public void startCountdown() {
+        _doCountdown = true;
     }
 
     public boolean getIsPaused() {
@@ -58,6 +76,7 @@ public class GameWorld extends View {
         _map = _mapBuilder.getMap();
 
         SoundManager.getInstance().initialize(context);
+        _counterdownerDuration = _initialCountdownDuration;
 
         Timer _updateTimer = new Timer();
         _updateTimer.schedule(new TimerTask() {
@@ -68,9 +87,16 @@ public class GameWorld extends View {
         }, 0, 16);
     }
 
-    public void restartRound() {
+    public void restartRound(boolean resetCoins) {
         for (int i = 0; i < _gameObjects.size(); i++) {
             GameObject gameObject = _gameObjects.get(i);
+
+            if (!resetCoins &&
+                gameObject.compareTag("COIN", "BIGCOIN"))
+            {
+                continue;
+            }
+
             gameObject.setIsActive(true);
             gameObject.onReset();
         }
@@ -79,11 +105,33 @@ public class GameWorld extends View {
     public void onUpdate() {
         //Calculate deltatime
         long currTime = System.nanoTime();
-        float deltaTime = ((currTime - _lastTime) / 1000000000f);
+        _deltaTime = ((currTime - _lastTime) / 1000000000f);
         _lastTime = currTime;
 
         if (_isPaused)
             return;
+
+        if (_doCountdown) {
+            _countdowner += _deltaTime;
+
+            float interval = _counterdownerDuration / 3;
+            String intervalTxt = "";
+
+            if (_countdowner < interval * 3)
+                intervalTxt = "START!";
+            if (_countdowner < interval * 2)
+                intervalTxt = "SET";
+            if (_countdowner < interval)
+                intervalTxt = "READY";
+
+            GameManager.getInstance().setStatusTxt(intervalTxt);
+
+            if (_countdowner >= _counterdownerDuration) {
+                _counterdownerDuration = _normalCountdownDuration;
+                _countdowner = 0;
+                _doCountdown = false;
+            }
+        }
 
         //Remove gameobjects that were marked for removal last frame
         for (int i = 0; i < _gameObjectsToRemove.size(); i++) {
@@ -101,14 +149,14 @@ public class GameWorld extends View {
         //Run update method for each gameobject
         for (int i = 0; i < _gameObjects.size(); i++) {
             GameObject gameObject = _gameObjects.get(i);
-            gameObject.onUpdate(deltaTime);
+            gameObject.onUpdate(_deltaTime);
         }
 
         postInvalidate();
     }
 
     public void onDraw(Canvas canvas) {
-        if (_canvasMatrix == null) {
+        if (_canvasMatrix == null || getResources().getConfiguration().orientation != _lastOrientation) {
             updateCanvasMatrix(canvas);
         }
 
@@ -148,8 +196,8 @@ public class GameWorld extends View {
         if (bgHeight < height)
             yScale = bgHeight / height;
 
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        _lastOrientation = getResources().getConfiguration().orientation;
+        if (_lastOrientation == Configuration.ORIENTATION_PORTRAIT) {
             yScale = xScale;
             height += height * (1 - yScale);
 
@@ -169,6 +217,9 @@ public class GameWorld extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (_isPaused || _doCountdown)
+            return false;
+
         _onTouchObjects = _gameObjects.toArray(_onTouchObjects);
 
         int index = event.getActionIndex();

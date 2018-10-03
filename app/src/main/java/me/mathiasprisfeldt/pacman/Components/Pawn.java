@@ -37,9 +37,13 @@ public class Pawn extends Component implements Updateable, Resetable {
     }
 
     private void ResetPos() {
-        _currNode = _spawnPoint;
+        SetPos(_spawnPoint);
+    }
+
+    private void SetPos(Node node) {
+        _currNode = node;
         onNewNode(_currNode);
-        _gameObject.getTransform().setPosition(_spawnPoint.getPosition());
+        _gameObject.getTransform().setPosition(_currNode.getPosition());
     }
 
     @Override
@@ -47,7 +51,8 @@ public class Pawn extends Component implements Updateable, Resetable {
         Transform transform = _gameObject.getTransform();
         Vector2D pos = transform.getPosition();
 
-        transform.setVelocity(_direction.toVector().multiply(_speed));
+        if (!_gameWorld.isCountdowning())
+            transform.setVelocity(_direction.toVector().multiply(_speed));
 
         if (_currEdge != null)
             transform.setPosition(pos = _currEdge.Clamp(pos));
@@ -57,11 +62,23 @@ public class Pawn extends Component implements Updateable, Resetable {
 
         for (Node node : _map.getNodes()) {
           if (node.isColliding(pos)){
+              Node newNode = node;
+
+              Node portalEnd = newNode.getPortalEnd();
+              if (_currNode == null &&
+                  portalEnd != null &&
+                  _lastNode != portalEnd)
+             {
+                  _lastNode = newNode;
+                  newNode = portalEnd;
+                  SetPos(newNode);
+              }
+
               if (_currNode == null)
-                  onNewNode(node);
+                  onNewNode(newNode);
 
               _lastNode = _currNode;
-              _currNode = node;
+              _currNode = newNode;
 
               if (_queuedDir != CardinalDirection.None)
                 onNewDirection(_queuedDir);
