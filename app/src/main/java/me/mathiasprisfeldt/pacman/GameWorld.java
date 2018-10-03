@@ -1,7 +1,10 @@
 package me.mathiasprisfeldt.pacman;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
+import android.graphics.DrawFilter;
+import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -23,6 +26,8 @@ public class GameWorld extends View {
     private MapBuilder _mapBuilder;
     private Map _map;
 
+    private Matrix _canvasMatrix;
+
     private GameObject[] _onDrawObjects = new GameObject[0];
     private GameObject[] _onTouchObjects = new GameObject[0];
 
@@ -30,11 +35,6 @@ public class GameWorld extends View {
     private ArrayList<GameObject> _gameObjectsToAdd = new ArrayList<>();
     private ArrayList<GameObject> _gameObjectsToRemove = new ArrayList<>();
     private VelocityTracker velocityTracker;
-    private Vector2D _dimensions;
-
-    public Vector2D getDimensions() {
-        return _dimensions;
-    }
 
     public ArrayList<GameObject> getGameObjects() {
         return _gameObjects;
@@ -108,7 +108,12 @@ public class GameWorld extends View {
     }
 
     public void onDraw(Canvas canvas) {
-        _dimensions = new Vector2D(canvas.getWidth(), canvas.getHeight());
+        if (_canvasMatrix == null) {
+            updateCanvasMatrix(canvas);
+        }
+
+        canvas.setMatrix(_canvasMatrix);
+
         _onDrawObjects = _gameObjects.toArray(_onDrawObjects);
         canvas.drawColor(getResources().getColor(R.color.game_world_bg_color));
 
@@ -122,6 +127,45 @@ public class GameWorld extends View {
         GameManager.getInstance().onUI(_inGame);
 
         super.onDraw(canvas);
+    }
+
+    private void updateCanvasMatrix(Canvas canvas) {
+        _canvasMatrix = new Matrix();
+
+        Vector2D mapSize = _map.getMapSize();
+        float bgRatio = mapSize.y() / mapSize.x();
+        float bgWidth = mapSize.x();
+        float bgHeight = mapSize.y();
+        float x;
+        float y;
+        int width = canvas.getWidth();
+        int height = canvas.getHeight();
+
+        float xScale = width / bgWidth;
+        if (bgWidth < width)
+            xScale = bgWidth / width;
+
+        float yScale = height / bgHeight;
+        if (bgHeight < height)
+            yScale = bgHeight / height;
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            yScale = xScale;
+            height += height * (1 - yScale);
+
+            x = 0;
+            y = height / 2 - bgHeight / 2;
+        } else {
+            xScale = yScale;
+            width = (int) (width / xScale);
+
+            x = width / 2 - bgWidth / 2;
+            y = 0;
+        }
+
+        _canvasMatrix.setTranslate(x, y);
+        _canvasMatrix.postScale(xScale, yScale);
     }
 
     @Override

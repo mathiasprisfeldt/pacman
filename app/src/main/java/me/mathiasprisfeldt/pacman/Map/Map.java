@@ -16,7 +16,6 @@ import me.mathiasprisfeldt.pacman.Types.Vector2D;
 public class Map {
     private GameWorld _gameWorld;
     private Bitmap _background;
-    private Bitmap _backgroundScaled;
 
     private Paint _mapPaint = new Paint();
     private Paint _bgPaint = new Paint();
@@ -28,11 +27,16 @@ public class Map {
     private Node _enemySpawnPoint;
     private Vector2D _offset = Vector2D.Zero;
 
+    private Vector2D _mapSize;
     private int _width;
     private int _height;
     private Vector2D _cellDimensions;
     private int _columns = 14;
     private int _rows = 14;
+
+    public Vector2D getMapSize() {
+        return _mapSize;
+    }
 
     public Node getPacmanSpawnPoint() {
         return _pacmanSpawnPoint;
@@ -53,8 +57,9 @@ public class Map {
     Map(GameWorld gameWorld) {
         _gameWorld = gameWorld;
         _background = BitmapFactory.decodeResource(gameWorld.getResources(), R.drawable.game_board);
-
-        setupBackground();
+        _mapSize = new Vector2D(_background.getWidth(), _background.getHeight());
+        _width = _background.getWidth();
+        _height = _background.getHeight();
 
         Node topLeft = CreateNode(0, 0);
         Node topRight = CreateNode(_columns, 0);
@@ -91,38 +96,6 @@ public class Map {
         _mapPaint.setStrokeWidth(5f);
     }
 
-    private void setupBackground() {
-        if (_backgroundScaled == null) {
-            int bgWidth = _background.getWidth();
-            int bgHeight = _background.getHeight();
-            float bgRatio = bgHeight / bgWidth;
-
-            float x;
-            float y;
-            int width = 1038;
-            int height = 1428;
-
-            int orientation = _gameWorld.getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                bgWidth = width;
-                bgHeight = (int) (width * bgRatio);
-                x = 0;
-                y = height / 2 - bgHeight / 2;
-            } else {
-                bgWidth = (int) (height * bgRatio);
-                bgHeight = height;
-                x = width / 2 - bgWidth / 2;
-                y = 0;
-            }
-
-            _backgroundScaled = Bitmap.createScaledBitmap(_background, bgWidth, bgHeight, false);
-            _offset = new Vector2D(x, y);
-            _width = bgWidth;
-            _height = bgHeight - (bgHeight / 15);
-            _cellDimensions = new Vector2D(_width / _columns / 2, _height / _rows / 2);
-        }
-    }
-
     private Node CreateNode(float x, float y) {
         Vector2D mapCoord = getMapCoord(x, y);
         Node newNode = new Node(mapCoord.x(), mapCoord.y());
@@ -144,11 +117,11 @@ public class Map {
         float yStep = coordY;
         float y = yStep * (_height / _rows);
 
-        return new Vector2D(x + _cellDimensions.x(), y - _cellDimensions.y()).add(_offset);
+        return new Vector2D(x, y).add(_offset);
     }
 
     public void onDraw(Canvas canvas) {
-        canvas.drawBitmap(_backgroundScaled, _offset.x(), _offset.y(), _bgPaint);
+        canvas.drawBitmap(_background, 0, 0, _bgPaint);
 
         for (Node node : _nodes) {
             Vector2D pos = node.getPosition();
