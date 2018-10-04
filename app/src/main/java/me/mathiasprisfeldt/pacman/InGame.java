@@ -55,5 +55,6 @@ public class InGame extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         GameManager.getInstance().saveHighscore();
+        SoundManager.getInstance().stopSound();
     }
 }

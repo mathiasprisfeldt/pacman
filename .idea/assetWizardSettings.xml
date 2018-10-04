@@ -30,11 +30,23 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="foregroundClipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="foregroundImage">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
                                               <map>
+                                                <entry key="scalingPercent" value="109" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -46,9 +58,9 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
-                                      <entry key="foregroundImage" value="D:\Users\DJart\Desktop\Resources\Ghost 0 3.png" />
+                                      <entry key="foregroundImage" value="D:\Users\DJart\Desktop\unnamed.png" />
                                       <entry key="foregroundLayerName" value="ic_launcher_foreground" />
-                                      <entry key="outputName" value="enemy_red" />
+                                      <entry key="outputName" value="logo" />
                                     </map>
                                   </option>
                                 </PersistentState>

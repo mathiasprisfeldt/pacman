@@ -23,7 +23,7 @@ public class GameWorld extends View {
     private boolean _doCountdown;
     private float _countdowner;
     private float _counterdownerDuration;
-    private float _normalCountdownDuration = 2;
+    private float _normalCountdownDuration = 3.75f;
     private float _initialCountdownDuration = 4;
 
     private boolean _isPaused;
@@ -64,6 +64,7 @@ public class GameWorld extends View {
 
     public void setIsPaused(boolean _isPaused) {
         this._isPaused = _isPaused;
+        SoundManager.getInstance().pause(_isPaused);
     }
 
     public GameWorld(Context context, AttributeSet attrs) {

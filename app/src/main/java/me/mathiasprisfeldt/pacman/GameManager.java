@@ -67,7 +67,6 @@ public class GameManager {
 
     public void restartRound(boolean clearCoins) {
         if (_gameover) {
-            _gameWorld.setIsPaused(true);
             saveHighscore();
             return;
         }
@@ -80,6 +79,7 @@ public class GameManager {
     private void roundWon() {
         set_score(_score + 500);
         _coins = 0;
+        SoundManager.getInstance().playSound(SoundManager.win, 1.25f);
         restartRound(true);
     }
 

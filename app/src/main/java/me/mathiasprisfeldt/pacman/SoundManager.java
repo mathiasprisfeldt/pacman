@@ -16,6 +16,7 @@ public class SoundManager {
     public static int eat;
     public static int roundStart;
     public static int death;
+    public static int win;
 
     void initialize(Context context) {
         _soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 100);
@@ -30,6 +31,7 @@ public class SoundManager {
         eat = _soundPool.load(context, R.raw.eat, 1);
         roundStart = _soundPool.load(context, R.raw.round_start, 20);
         death = _soundPool.load(context, R.raw.death, 1);
+        win = _soundPool.load(context, R.raw.win, 1);
     }
 
     public void playEatSound() {
@@ -42,6 +44,20 @@ public class SoundManager {
 
     public void playSound(int soundId, float rate) {
         _soundPool.play(soundId, 1, 1, 1, 0, rate);
+    }
+
+    public void pause(boolean toggler) {
+        if (_soundPool != null) {
+            if (toggler)
+                _soundPool.autoPause();
+            else
+                _soundPool.autoResume();
+        }
+    }
+
+    public void stopSound() {
+        if (_soundPool != null)
+            _soundPool.release();
     }
 
 }
